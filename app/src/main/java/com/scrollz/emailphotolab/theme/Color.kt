@@ -3,6 +3,7 @@ package com.scrollz.emailphotolab.theme
 import androidx.compose.ui.graphics.Color
 
 val DarkBluePrimary = Color(0xFF529EF4)
+val DarkBlueInversePrimary = Color(0xFF529EF4).copy(alpha = 0.1f)
 val DarkGrayBackground = Color(0xFF191919)
 val DarkGraySurface = Color(0xFF2B2B2B)
 val DarkGrayOnSurface = Color(0xFFB2B3B5)
@@ -13,6 +14,7 @@ val DarkWhiteOnBackground = Color(0xFFE2E3E7)
 val DarkRedError = Color(0xFF3B2828)
 
 val LightBluePrimary = Color(0xFF2688EB)
+val LightBlueInversePrimary = Color(0xFF2688EB).copy(alpha = 0.1f)
 val LightWhiteBackground = Color(0xFFFFFFFF)
 val LightGraySurface = Color(0xFFECEDF1)
 val LightBlackOnSurface = Color(0xFF000000)

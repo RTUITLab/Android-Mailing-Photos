@@ -31,6 +31,7 @@ fun Navigation() {
             composable(
                 route = Destination.Start.route
             ) {
+//                CameraXScreen()
                 StartScreen(
                     modifier = Modifier.fillMaxSize(),
                     navigateToFill = {

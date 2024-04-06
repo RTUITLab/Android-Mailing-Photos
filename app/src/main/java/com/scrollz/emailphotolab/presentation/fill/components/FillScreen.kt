@@ -26,10 +26,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.scrollz.emailphotolab.R
 import com.scrollz.emailphotolab.presentation.common.PrimaryButton
+import com.scrollz.emailphotolab.presentation.common.SecondaryButton
 import com.scrollz.emailphotolab.presentation.fill.FillEvent
 import com.scrollz.emailphotolab.presentation.fill.FillState
+import com.scrollz.emailphotolab.presentation.photo.ImageCaptureContract
 import com.scrollz.emailphotolab.util.SettingsContract
 
 @Composable
@@ -47,7 +51,7 @@ fun FillScreen(
         onResult = {  }
     )
     val takePictureLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicture(),
+        contract = ImageCaptureContract(),
         onResult = { saved -> if (saved) { onEvent(FillEvent.OnPhotoTaken) } }
     )
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
@@ -73,86 +77,101 @@ fun FillScreen(
 
     LaunchedEffect(state.saved) { if (state.saved) { navigateToFinish() } }
 
-    Scaffold(
-        modifier = modifier,
-        topBar = { TopBar (navigateBack = navigateBack) }
-    ) { paddingValues ->
-        Column(
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp)
+            .verticalScroll(scrollState),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Spacer(modifier = Modifier.height(8.dp))
+        EmailTextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = state.emailText,
+            placeholderText = "Email",
+            enabled = state.enabled,
+            isError = !state.isEmailValid,
+            onValueChange = { value -> onEvent(FillEvent.ChangeEmail(value)) },
+            clearField = { onEvent(FillEvent.ChangeEmail("")) }
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        LazyVerticalGrid(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = 16.dp)
-                .verticalScroll(scrollState),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxWidth()
+                .heightIn(max = 640.dp),
+            columns = GridCells.Adaptive(160.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            userScrollEnabled = false
         ) {
-            EmailTextField(
-                modifier = Modifier.fillMaxWidth(),
-                value = state.emailText,
-                placeholderText = "Email",
-                enabled = state.enabled,
-                isError = !state.isEmailValid,
-                onValueChange = { value -> onEvent(FillEvent.ChangeEmail(value)) },
-                clearField = { onEvent(FillEvent.ChangeEmail("")) }
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            LazyVerticalGrid(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(max = 640.dp),
-                columns = GridCells.Adaptive(160.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                userScrollEnabled = false
-            ) {
-                itemsIndexed(
-                    items = state.photos
-                ) { index, photo ->
-                    PhotoCard(
-                        photo = photo,
-                        enabled = state.enabled,
-                        takePhoto = {
-                            onEvent(FillEvent.OnTakePhoto(index))
-                            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
-                        }
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.height(32.dp))
-            Spacer(modifier = Modifier.weight(1f, fill = true))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Checkbox(
-                    checked = state.checked,
-                    onCheckedChange = { value -> onEvent(FillEvent.ToggleCheck(value)) },
+            itemsIndexed(
+                items = state.photos
+            ) { index, photo ->
+                PhotoCard(
+                    photo = photo,
                     enabled = state.enabled,
-                    colors = CheckboxDefaults.colors(
-                        checkedColor = MaterialTheme.colorScheme.primary,
-                        uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        checkmarkColor = MaterialTheme.colorScheme.onPrimary,
-                        disabledCheckedColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        disabledUncheckedColor = MaterialTheme.colorScheme.onPrimary
-                    )
-                )
-                Text(
-                    text = "Я согласен на обработку и хранение данных",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = if (state.checked) MaterialTheme.colorScheme.onBackground
-                            else MaterialTheme.colorScheme.onSurfaceVariant
+                    takePhoto = {
+                        onEvent(FillEvent.OnTakePhoto(index))
+                        cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                    },
+                    painter = when (index) {
+                        1 -> painterResource(R.drawable.face2)
+                        2 -> painterResource(R.drawable.face3)
+                        3 -> painterResource(R.drawable.face4)
+                        else -> painterResource(R.drawable.face1)
+                    }
                 )
             }
-            Spacer(modifier = Modifier.height(8.dp))
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.weight(1f, fill = true))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Checkbox(
+                checked = state.checked,
+                onCheckedChange = { value -> onEvent(FillEvent.ToggleCheck(value)) },
+                enabled = state.enabled,
+                colors = CheckboxDefaults.colors(
+                    checkedColor = MaterialTheme.colorScheme.primary,
+                    uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    checkmarkColor = MaterialTheme.colorScheme.onPrimary,
+                    disabledCheckedColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    disabledUncheckedColor = MaterialTheme.colorScheme.onPrimary
+                )
+            )
+            Text(
+                text = "Я согласен на обработку и хранение данных",
+                style = MaterialTheme.typography.bodyMedium,
+                color = if (state.checked) MaterialTheme.colorScheme.onBackground
+                else MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        Spacer(modifier = Modifier.height(4.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            SecondaryButton(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(56.dp),
+                onClick = navigateBack,
+                text = "Вернуться",
+                textStyle = MaterialTheme.typography.displayLarge,
+                enabled = true
+            )
             PrimaryButton(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .weight(1f)
                     .height(56.dp),
                 onClick = { onEvent(FillEvent.Save) },
                 text = "Сохранить",
                 textStyle = MaterialTheme.typography.displayLarge,
                 enabled = state.enabled && state.isButtonEnabled
             )
-            Spacer(modifier = Modifier.height(8.dp))
         }
+        Spacer(modifier = Modifier.height(8.dp))
     }
 }

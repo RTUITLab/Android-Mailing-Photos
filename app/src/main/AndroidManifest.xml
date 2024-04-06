@@ -28,6 +28,12 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".presentation.photo.PhotoActivity"
+            android:exported="true"
+            android:theme="@style/Theme.EmailPhotoLab">
+        </activity>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"

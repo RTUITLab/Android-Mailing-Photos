@@ -15,6 +15,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -30,7 +32,8 @@ fun PhotoCard(
     modifier: Modifier = Modifier,
     photo: Photo,
     enabled: Boolean,
-    takePhoto: () -> Unit
+    takePhoto: () -> Unit,
+    painter: Painter
 ) {
     Card(
         modifier = modifier,
@@ -43,7 +46,8 @@ fun PhotoCard(
         SubcomposeAsyncImage(
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(5 / 4f),
+                .aspectRatio(1f)
+                .clip(RoundedCornerShape(16.dp)),
             model = ImageRequest.Builder(LocalContext.current)
                 .data(photo.uri)
                 .memoryCacheKey(photo.key)
@@ -53,7 +57,7 @@ fun PhotoCard(
             loading = {
                 Icon(
                     modifier = Modifier.fillMaxSize(),
-                    painter = painterResource(R.drawable.image_holder),
+                    painter = painter,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -61,23 +65,13 @@ fun PhotoCard(
             error = {
                 Icon(
                     modifier = Modifier.fillMaxSize(),
-                    painter = painterResource(R.drawable.image_holder),
+                    painter = painter,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             },
             contentDescription = null
         )
-        Spacer(modifier = Modifier.height(12.dp))
-        Text(
-            modifier = Modifier
-                .padding(horizontal = 8.dp)
-                .align(Alignment.CenterHorizontally),
-            text = photo.title,
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-        Spacer(modifier = Modifier.height(4.dp))
         PrimaryButton(
             modifier = Modifier
                 .padding(8.dp)
