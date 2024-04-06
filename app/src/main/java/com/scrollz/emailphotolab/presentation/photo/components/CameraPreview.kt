@@ -1,21 +1,16 @@
 package com.scrollz.emailphotolab.presentation.photo.components
 
-import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.net.Uri
 import android.util.Log
 import android.util.Size
-import android.view.Surface
 import androidx.annotation.OptIn
 import androidx.camera.camera2.interop.Camera2CameraInfo
 import androidx.camera.camera2.interop.ExperimentalCamera2Interop
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
-import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.ImageCapture
-import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.core.resolutionselector.ResolutionSelector
@@ -26,8 +21,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,7 +33,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import java.util.concurrent.Executors
 
 @OptIn(ExperimentalCamera2Interop::class)
 @Composable
@@ -89,7 +81,7 @@ internal fun CameraPreview(
                 val resolutionSelector = ResolutionSelector.Builder()
                     .setResolutionStrategy(ResolutionStrategy.HIGHEST_AVAILABLE_STRATEGY)
                     .setResolutionFilter { a, _ ->
-                        Log.i("sizes", a.toString());
+                        Log.i("sizes", a.toString())
                         listOf(Size(1920, 1080))
                     }.build()
 
@@ -108,8 +100,9 @@ internal fun CameraPreview(
                             if (imageTaken) {
                                 saveImage(imageProxy)
                                 close(true)
+                            } else {
+                                imageProxy.close()
                             }
-                            imageProxy.close()
                         }
                     }
 
@@ -141,37 +134,16 @@ internal fun CameraPreview(
     ) {
         AndroidView(
             modifier = Modifier.aspectRatio(
-                ratio = if (isLandscape) 9/16f else 9/16f,
+                ratio = 9/16f,
                 matchHeightConstraintsFirst = isLandscape
             ),
             factory = { previewView }
         )
         CameraUI(
             modifier = modifier,
-            isLandscape = isLandscape,
             isButtonEnabled = isButtonEnabled,
             takePhoto = takePhoto,
             close = { close(false) }
         )
     }
-
-//    Surface(
-//        modifier = Modifier,
-//        color = Color.Black
-//    ) {
-//        AndroidView(
-//            modifier = Modifier.aspectRatio(
-//                ratio = if (isLandscape) 9/16f else 9/16f,
-//                matchHeightConstraintsFirst = isLandscape
-//            ),
-//            factory = { previewView }
-//        )
-//        CameraUI(
-//            modifier = modifier,
-//            isLandscape = isLandscape,
-//            isButtonEnabled = isButtonEnabled,
-//            takePhoto = takePhoto,
-//            close = { close(false) }
-//        )
-//    }
 }

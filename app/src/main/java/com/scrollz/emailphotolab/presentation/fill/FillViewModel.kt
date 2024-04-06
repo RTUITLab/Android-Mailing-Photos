@@ -53,7 +53,7 @@ class FillViewModel @Inject constructor(
     private fun createTempFiles() {
         viewModelScope.launch {
             clearCache()
-            val names = listOf("Фото 1", "Фото 2", "Фото 3", "Фото 4")
+            val names = listOf("photo1", "photo2", "photo3", "photo4")
             _state.value.photos.addAll(createTempFiles(names))
         }
     }
